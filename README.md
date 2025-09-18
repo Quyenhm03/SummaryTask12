@@ -1,6 +1,6 @@
 # 🛒 HỆ THỐNG QUẢN LÝ CỬA HÀNG
 
-## 📌 Giới thiệu
+## Giới thiệu
 Hệ thống quản lý cửa hàng được xây dựng bằng ngôn ngữ **Kotlin**, áp dụng các kiến thức từ cơ bản đến nâng cao.  
 Mục tiêu: quản lý **sản phẩm**, **khách hàng**, và **đơn hàng** một cách hiệu quả.  
 
