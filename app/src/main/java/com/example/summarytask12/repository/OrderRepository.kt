@@ -61,4 +61,33 @@ class OrderRepository(private val inventory: InventoryRepository) {
             order.customer.sendNotification("Update your order ${order.id}")
         }
     }
+
+    fun getAllCustomer() : List<Customer> {
+        val listCustomer = mutableListOf<Customer>()
+        for ((key, value) in customers) {
+            listCustomer.add(value)
+        }
+
+        return listCustomer.toList()
+    }
+
+    fun printOrders() {
+        println("All orders in store:")
+        orders.forEachIndexed { index, order ->
+            println("   ${index + 1}: ${order.toString()}")
+        }
+    }
+
+    fun getRecentOrders(count: Int) : List<Order> {
+        val listOrder = mutableListOf<Order>()
+        val orderRev= orders.reversed()
+        for (order in orderRev) {
+            if (count > 0) {
+                listOrder.add(order)
+            } else {
+                break
+            }
+        }
+        return listOrder.toList()
+    }
 }

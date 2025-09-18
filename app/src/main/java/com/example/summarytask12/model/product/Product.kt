@@ -13,10 +13,10 @@ abstract class Product (
     constructor(id: String, name: String, price: Double) : this(id, name, price, 0)
     constructor(id: String, name: String) : this(id, name, 0.0, 0)
 
-    fun getId() = id
-    fun getName() = name
-    fun getPrice() = price
-    fun getStock() = stock
+    fun getPropertyId() = id
+    fun getPropertyName() = name
+    fun getPropertyPrice() = price
+    fun getPropertyStock() = stock
     fun setDescription(newDescription: String?) {
         description = newDescription
     }
@@ -43,5 +43,5 @@ abstract class Product (
 
     override fun calculateDiscount(amount: Double): Double = amount * 0.1
 
-    open fun calculateDiscount(): Double = calculateDiscount(getPrice())
+    open fun calculateDiscount(): Double = calculateDiscount(price)
 }
