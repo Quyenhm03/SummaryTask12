@@ -21,7 +21,7 @@ object DatabaseConnect {
 
     fun query(statement: String): Any? {
         return if (isConnected) {
-            println(" Executing query: $statement")
+            println("Executing query: $statement")
             when {
                 statement.contains("SELECT product") -> "Product data"
                 statement.contains("SELECT electronics") -> "Electronics data"

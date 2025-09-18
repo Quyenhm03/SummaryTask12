@@ -9,8 +9,6 @@ import com.example.summarytask12.util.DatabaseConnect
 class InventoryRepository {
     private val products: MutableList<Product> = mutableListOf()
 
-    fun getProducts() = products
-
     init {
         if (!DatabaseConnect.isConnected()) {
             throw IllegalStateException("Database not connected")
@@ -31,5 +29,39 @@ class InventoryRepository {
                 DatabaseConnect.query("INSERT INTO clothing(id, size) VALUES ('${product.getId()}', '${product.getSize().name}')")
             }
         }
+    }
+
+    fun findById(id: String) : Product? {
+        DatabaseConnect.query("SELECT p.id, p.name, p.price, p.stock, p.description, e.warrantyYears, c.size " +
+                                        "FROM products p" +
+                                        "LEFT JOIN electronics e ON p.id = e.id" +
+                                        "LEFT JOIN clothing c ON p.id = c.id" +
+                                        "WHERE p.id = '$id'")
+        return products.find { it.getId() == id }
+    }
+
+    fun searchProducts(query: String, minPrice: Double = 0.0, category: String? = null) : List<Product> {
+        return products.filter { prod ->
+            prod.getName().contains(query, ignoreCase = true) &&
+            prod.getPrice() >= minPrice &&
+            (category == null || when (prod) {
+                is Electronics -> category == "Electronics"
+                is Clothing -> category == "Clothing"
+                else -> false
+            })
+        }
+    }
+
+    fun updateStock(productId: String, newStock: Int) {
+        val product = findById(productId)
+        if (product != null && newStock >= 0) {
+            product.updateStock(newStock)
+            DatabaseConnect.query("UPDATE products SET stock=${product.getStock()} WHERE id='$productId'")
+        }
+    }
+
+    fun checkLowStock(product: Product?): Boolean {
+        val p = product ?: return false
+        return p.getStock() < 5
     }
 }

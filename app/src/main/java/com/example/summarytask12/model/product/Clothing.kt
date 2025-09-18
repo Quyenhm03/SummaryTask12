@@ -4,9 +4,9 @@ import com.example.summarytask12.util.ClothingSize
 import com.example.summarytask12.util.DatabaseConnect
 
 class Clothing(
-    private val id: String,
-    private val name: String,
-    private val price: Double,
+    id: String,
+    name: String,
+    price: Double,
     private val size: ClothingSize
 ) : Product(id, name, price) {
     constructor(id: String, name: String, price: Double, size: String) : this(id, name, price, when (size.uppercase()) {

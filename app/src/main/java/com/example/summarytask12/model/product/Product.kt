@@ -3,10 +3,10 @@ package com.example.summarytask12.model.product
 import com.example.summarytask12.util.DatabaseConnect
 
 abstract class Product (
-    private val id: String,
-    private val name: String,
-    private var price: Double,
-    private var stock: Int = 0
+    protected val id: String,
+    protected val name: String,
+    protected var price: Double,
+    protected var stock: Int = 0
 ) : Discount {
     private var description: String?= null
 
