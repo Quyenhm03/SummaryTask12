@@ -225,7 +225,7 @@ fun customerManagement(orderRepo: OrderRepository) {
             2 -> updateCustomerInfo()
             3 -> displayCustomerSegment()
             4 -> testEmailValidation()
-            5 -> sendNotification()
+            5 -> sendNotification(orderRepo)
             6 -> displayListCustomer(orderRepo)
             0 -> return
             else -> println("Invalid option")
@@ -237,8 +237,17 @@ fun createCustomer(orderRepo: OrderRepository) {
     print("Customer name: ")
     val name = readlnOrNull() ?: return
 
-    print("Email (optional): ")
-    val email = readlnOrNull()?.takeIf { it.isNotBlank() }
+    print("Email: ")
+    var firstInput = true
+    var email: String
+    do {
+        email = readlnOrNull()?.takeIf { it.isNotBlank() }.toString()
+        if (firstInput) {
+            firstInput = false
+        } else {
+            print("Please enter valid email: ")
+        }
+    } while(!email.isValidEmail())
 
     val customer = Customer.create(name, email)
     orderRepo.addCustomer(customer)
@@ -259,7 +268,7 @@ fun displayCustomerSegment() {
     print("Customer age: ")
     val age = readlnOrNull()?.toIntOrNull() ?: return
 
-    val testCustomer = Customer.create("Test", null)
+    val testCustomer = Customer.create("Test", "test@gmail.com")
     val segment = testCustomer.getCustomerSegment(age)
     println("Customer segment: $segment")
 }
@@ -271,11 +280,16 @@ fun testEmailValidation() {
     println("Valid email: $isValid")
 }
 
-fun sendNotification() {
-    val customer = Customer.create("Test Client", "test@example.com")
-    print("Notification message: ")
-    val message = readlnOrNull() ?: return
-    customer.sendNotification(message)
+fun sendNotification(orderRepo: OrderRepository) {
+    print("CustomerID: ")
+    val id = readlnOrNull() ?: return
+
+    val customer = orderRepo.getCustomerByID(id)
+    if (customer != null) {
+        customer.sendNotification("Notification test")
+    } else {
+        println("Customer $id not found!")
+    }
 }
 
 fun displayListCustomer(orderRepo: OrderRepository) {

@@ -90,4 +90,14 @@ class OrderRepository(private val inventory: InventoryRepository) {
         }
         return listOrder.toList()
     }
+
+    fun getCustomerByID(id: String) : Customer? {
+        for ((key, value) in customers) {
+            if (value.id == id) {
+                return value
+            }
+        }
+
+        return null
+    }
 }

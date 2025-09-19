@@ -3,7 +3,7 @@ package com.example.summarytask12.model.product
 import com.example.summarytask12.util.ClothingSize
 import com.example.summarytask12.util.DatabaseConnect
 
-class Clothing(
+class Clothing (
     id: String,
     name: String,
     price: Double,
@@ -13,13 +13,11 @@ class Clothing(
         "S" -> ClothingSize.S
         "M" -> ClothingSize.M
         "L" -> ClothingSize.L
-        "XL" -> {
-            ClothingSize.XL
-        }
+        "XL" -> ClothingSize.XL
         else -> throw IllegalArgumentException("Invalid size: $size")
     })
 
-    override fun getDescription(): String = "Clothing: $name (Size: $size)"
+    override fun getDescription(): String = "Clothing: ${getPropertyName()} (Size: $size)"
     override fun calculateDiscount(amount: Double): Double {
         return if (size == ClothingSize.XL) {
             amount * 0.05

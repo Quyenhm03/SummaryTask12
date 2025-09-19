@@ -1,7 +1,5 @@
 package com.example.summarytask12.model.product
 
-import com.example.summarytask12.util.DatabaseConnect
-
 class Electronics (
     id: String,
     name: String,
@@ -11,7 +9,7 @@ class Electronics (
     constructor(id: String, name: String, price: Double) : this(id, name, price, null)
 
     override fun getDescription(): String {
-        return "Electronics: $name with ${warrantyYears ?: 0} year warranty costs $price VND"
+        return "Electronics: ${getPropertyName()} with ${warrantyYears ?: 0} year warranty costs ${getPropertyPrice()} VND"
     }
 
     override fun calculateDiscount(): Double {
