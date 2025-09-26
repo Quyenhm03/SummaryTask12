@@ -1,45 +1,27 @@
 package com.example.summarytask12.model.product
 
-abstract class Product (
-    private val id: String,
-    private val name: String,
-    private var price: Double,
-    private var stock: Int = 0
-) : Discount {
-    private var description: String?= null
+abstract class Product(
+    val id: String,
+    val name: String,
+    var price: Double,
+    val category: ProductCategory,
+    var stock: Int = 0
+) {
+    var description: String? = null
 
-    constructor(id: String, name: String, price: Double) : this(id, name, price, 0)
-    constructor(id: String, name: String) : this(id, name, 0.0, 0)
-
-    fun getPropertyId() = id
-    fun getPropertyName() = name
-    fun getPropertyPrice() = price
-    fun getPropertyStock() = stock
-    fun setDescription(newDescription: String?) {
-        description = newDescription
-    }
-
-    fun updatePrice(newPrice: Double) {
-        if (newPrice > 0 && newPrice != price) {
-            price = newPrice
-        }
-    }
-
-    fun updateStock(newStock: Int) {
-        if (stock + newStock >= 0) {
+    fun updateStock(newStock: Int): Result<Unit> {
+        return if (stock + newStock >= 0) {
             stock += newStock
+            Result.success(Unit)
         } else {
-            // do nothing
+            Result.failure(IllegalStateException("Stock not enough"))
         }
     }
-
-    abstract fun getDescription(): String
 
     override fun toString(): String {
-        return "Product(id = $id, name = $name, price = $price)"
+        return "Product(id='$id', name='$name', price=${price.toInt()}, stock=$stock, category=$category)"
     }
 
-    override fun calculateDiscount(amount: Double): Double = amount * 0.1
-
-    open fun calculateDiscount(): Double = calculateDiscount(price)
+    abstract fun generateDescription(): String
+    abstract fun calculateDiscountProduct(amount: Double): Double
 }

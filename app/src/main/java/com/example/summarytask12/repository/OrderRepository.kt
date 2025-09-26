@@ -1,103 +1,56 @@
 package com.example.summarytask12.repository
 
-import com.example.summarytask12.model.Customer
-import com.example.summarytask12.model.Order
+import com.example.summarytask12.model.order.Order
+import com.example.summarytask12.model.order.OrderStatus
 import com.example.summarytask12.util.DatabaseConnect
 
-class OrderRepository(private val inventory: InventoryRepository) {
-    private val orders: MutableSet<Order> = mutableSetOf()
-    private val customers: MutableMap<String, Customer> = mutableMapOf()
-    private var orderCounter: Int = 0
+class OrderRepository {
+    val orders: MutableMap<String, Order> = mutableMapOf()
+    var orderCounter: Int = 0
 
-    init {
-        if (!DatabaseConnect.isConnected()) {
-            throw IllegalStateException("Database not connected")
+    fun save(order: Order): Result<Order> {
+        return try {
+            orders[order.id] = order
+            val query =
+                "INSERT INTO orders (id, customer_id, status, total_amount) VALUES ('${order.id}', '${order.customer.id}', '${order.status.name}', ${order.getTotalAmount()})"
+            DatabaseConnect.query(query)
+            println("Order saved: ${order.id}")
+            Result.success(order)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+    }
+
+    fun findById(id: String): Order? = orders[id]
+
+    fun findAll(): List<Order> = orders.values.toList()
+
+    fun update(order: Order): Result<Order> {
+        return if (orders.containsKey(order.id)) {
+            orders[order.id] = order
+            val query = "UPDATE orders SET status='${order.status.name}' WHERE id='${order.id}'"
+            DatabaseConnect.query(query)
+            Result.success(order)
+        } else {
+            Result.failure(NoSuchElementException("Order not found"))
         }
     }
 
-    fun addCustomer(customer: Customer) {
-        customers[customer.id] = customer
-        println("Added: ${customer.name}")
-        DatabaseConnect.query("INSERT INTO customers(id, name, email) VALUES (${customer.id}, ${customer.name}, ${customer.email})")
-    }
-
-    fun createOrder(customerId: String, productIds: List<String>) : Order? {
-        val customer = customers[customerId] ?: run {
-            println("Customer $customerId not found")
-            return null
-        }
-
+    fun generateOrderId(): String {
         orderCounter++
-
-        val order = Order("ORD-$orderCounter", customer)
-        DatabaseConnect.query("INSERT INTO orders(id, customer_id) VALUES ('${order.id}', '${customer.id}')")
-        for (pid in productIds) {
-            val product = inventory.findById(pid) ?: continue
-            if (order.addItem(product)) {
-                println("Item $pid added to order")
-                DatabaseConnect.query("INSERT INTO order_items(order_id, product_id) VALUES ('${order.id}', '$pid')")
-            }
-        }
-
-        if (order.items.isNotEmpty()) {
-            orders.add(order)
-            customer.addToHistory(order)
-            DatabaseConnect.query("INSERT INTO customer_orders(customer_id, order_id) VALUES ('${customer.id}', '${order.id}')")
-            return order
-        }
-        return null
+        return "ORD-${orderCounter.toString().padStart(5, '0')}"
     }
 
-    fun getOrderCount(): Int = orderCounter
-
-    fun getTotalRevenue() = orders.sumOf { it.totalAmount }
-
-    fun processPendingOrders() {
-        val pending = orders.filter {
-            it.orderDate == null
-        }
-        pending.reversed().forEach { order ->
-            println("Pending: $order.is - Sending reminder")
-            order.customer.sendNotification("Update your order ${order.id}")
-        }
+    fun findByCustomer(customerId: String): List<Order> {
+        return orders.values.filter { it.customer.id == customerId }
     }
 
-    fun getAllCustomer() : List<Customer> {
-        val listCustomer = mutableListOf<Customer>()
-        for ((key, value) in customers) {
-            listCustomer.add(value)
-        }
-
-        return listCustomer.toList()
+    fun findByStatus(status: OrderStatus): List<Order> {
+        return orders.values.filter { it.status == status }
     }
 
-    fun printOrders() {
-        println("All orders in store:")
-        orders.forEachIndexed { index, order ->
-            println("   ${index + 1}: ${order.toString()}")
-        }
-    }
-
-    fun getRecentOrders(count: Int) : List<Order> {
-        val listOrder = mutableListOf<Order>()
-        val orderRev= orders.reversed()
-        for (order in orderRev) {
-            if (count > 0) {
-                listOrder.add(order)
-            } else {
-                break
-            }
-        }
-        return listOrder.toList()
-    }
-
-    fun getCustomerByID(id: String) : Customer? {
-        for ((key, value) in customers) {
-            if (value.id == id) {
-                return value
-            }
-        }
-
-        return null
+    fun getTotalRevenue(): Double {
+        return orders.values.sumOf { it.getTotalAmount() }
     }
 }

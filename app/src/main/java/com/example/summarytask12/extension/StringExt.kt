@@ -1,6 +1,6 @@
 package com.example.summarytask12.extension
 
-fun String?.isValidEmail() : Boolean {
+fun String?.isValidEmail(): Boolean {
     if (this == null) {
         return false
     }

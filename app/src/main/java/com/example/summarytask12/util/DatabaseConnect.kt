@@ -6,15 +6,19 @@ object DatabaseConnect {
     fun connect() {
         if (!isConnected) {
             isConnected = true
-            println("Database connected")
+        } else {
+            // do nothing
         }
+        println("Database connected")
     }
 
     fun disconnect() {
         if (isConnected) {
             isConnected = false
-            println("Database disconnected")
+        } else {
+            // do nothing
         }
+        println("Database disconnected")
     }
 
     fun isConnected() = isConnected
