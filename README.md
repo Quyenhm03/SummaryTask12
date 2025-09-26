@@ -11,21 +11,24 @@ Mục tiêu: quản lý **sản phẩm**, **khách hàng**, và **đơn hàng** 
 - Thêm sản phẩm (electronics, clothing)  
 - Tìm kiếm sản phẩm  
 - Cập nhật số lượng kho  
-- Hiển thị thông tin sản phẩm  
+- Hiển thị thông tin sản phẩm
+- Báo cáo sản phẩm
 
 ### 2. Quản lý khách hàng
 - Thêm khách hàng vào hệ thống  
 - Cập nhật thông tin khách hàng  
 - Hiển thị nhóm khách hàng  
-- Xác minh email  
 - Gửi thông báo cho khách hàng  
-- Xem danh sách khách hàng  
 
 ### 3. Quản lý đơn hàng
 - Tạo đơn hàng  
 - Xem tất cả đơn hàng  
-- Xem đơn hàng mới tạo  
-- Tính tổng doanh thu  
+- Tìm kiếm đơn hàng  
+- Báo cáo đơn hàng
+  
+### 4. Phân tích và báo cáo
+- Báo cáo kho
+- Báo cáo doanh thu
 
 ---
 
