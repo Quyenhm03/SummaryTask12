@@ -2,6 +2,11 @@ package com.example.summarytask12
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.example.summarytask12.controller.CustomerController
+import com.example.summarytask12.controller.MenuController
+import com.example.summarytask12.controller.OrderController
+import com.example.summarytask12.controller.ProductController
+import com.example.summarytask12.controller.ReportController
 import com.example.summarytask12.model.product.Clothing
 import com.example.summarytask12.model.product.ClothingSize
 import com.example.summarytask12.model.product.Electronic
@@ -12,8 +17,14 @@ import com.example.summarytask12.service.CustomerService
 import com.example.summarytask12.service.OrderService
 import com.example.summarytask12.service.ProductService
 import com.example.summarytask12.util.DatabaseConnect
+import com.example.summarytask12.util.InputHandler
+import com.example.summarytask12.util.OutputHandler
 
 class StoreApplication {
+    companion object {
+        var currentRevenue: Double = 0.0
+    }
+
     val productRepository = ProductRepository()
     val customerRepository = CustomerRepository()
     val orderRepository = OrderRepository()
@@ -22,7 +33,15 @@ class StoreApplication {
     val customerService = CustomerService(customerRepository)
     val orderService = OrderService(orderRepository, productService, customerService)
 
-    val menuController = MenuController(productService, customerService, orderService)
+    val inputHandler = InputHandler()
+    val outputHandler = OutputHandler()
+
+    val productController = ProductController(productService, inputHandler, outputHandler)
+    val customerController = CustomerController(customerService, inputHandler, outputHandler)
+    val reportController = ReportController(productService, orderService, inputHandler, outputHandler)
+    val orderController = OrderController(orderService, inputHandler, outputHandler)
+
+    val menuController = MenuController(productController, customerController, orderController, reportController, inputHandler, outputHandler)
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun run() {
