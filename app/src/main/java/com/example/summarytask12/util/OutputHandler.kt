@@ -3,8 +3,10 @@ package com.example.summarytask12.util
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.summarytask12.model.customer.Customer
+import com.example.summarytask12.model.customer.CustomerType
 import com.example.summarytask12.model.order.Order
 import com.example.summarytask12.model.product.Product
+import com.example.summarytask12.service.CustomerService
 import com.example.summarytask12.service.InventoryReport
 import com.example.summarytask12.service.SalesReport
 import java.time.format.DateTimeFormatter
@@ -42,7 +44,7 @@ class OutputHandler {
         println("1. Add Electronic Product")
         println("2. Add Clothing Product")
         println("3. Search Products")
-        println("4. Find Product By Category")
+        println("4. Find Product ByCategory")
         println("5. Update Product Stock")
         println("6. Display Product Details")
         println("7. Product Analytics")
@@ -52,8 +54,12 @@ class OutputHandler {
     fun printCustomerMenu() {
         println("\n=== CUSTOMER MANAGEMENT ===")
         println("1. Create New Customer")
-        println("2. Find Customer")
-        println("3. View Customer Type")
+        println("2. Find Customer by ID")
+        println("3. Update Customer Info")
+        println("4. Delete Customer")
+        println("5. View All Customers")
+        println("6. View Top Customers")
+        println("7. View Customer Types")
         println("0. Return to Main Menu")
     }
 
@@ -202,9 +208,9 @@ class OutputHandler {
         println("=".repeat(60))
     }
 
-    fun printCustomerTypes(customerService: com.example.summarytask12.service.CustomerService) {
+    fun printCustomerTypes(customerService: CustomerService) {
         println("\nCustomer Type")
-        com.example.summarytask12.model.customer.CustomerType.values().forEach { type ->
+        CustomerType.entries.forEach { type ->
             val customers = customerService.getCustomersByType(type)
             println("\n${type.displayName} (${(type.discountRate * 100).toInt()}% discount)")
             println("  Minimum spending: ${type.minSpending.toInt()} VND")

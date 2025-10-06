@@ -76,7 +76,7 @@ class ProductController(
         val name = inputHandler.readLine("Product Name: ") ?: return
         val price = inputHandler.readDouble("Price (VND): ") ?: return
         val brand = inputHandler.readLine("Brand (default Generic): ") ?: "Generic"
-        outputHandler.printSuccess("Available sizes: ${ClothingSize.values().joinToString(", ") { "${it.name} (${it.displayName})" }}")
+        outputHandler.printSuccess("Available sizes: ${ClothingSize.entries.joinToString(", ") { "${it.name} (${it.displayName})" }}")
         val sizeInput = inputHandler.readLine("Size: ")?.uppercase() ?: return
         val size = try {
             ClothingSize.valueOf(sizeInput)
@@ -104,9 +104,9 @@ class ProductController(
         val query = inputHandler.readLine("Search query: ") ?: return
         val minPrice = inputHandler.readDouble("Minimum price (optional): ")
         val maxPrice = inputHandler.readDouble("Maximum price (optional): ")
-        outputHandler.printSuccess("Categories: ${ProductCategory.values().joinToString(", ") { it.displayName }}")
+        outputHandler.printSuccess("Categories: ${ProductCategory.entries.joinToString(", ") { it.displayName }}")
         val categoryInput = inputHandler.readLine("Category (optional): ")
-        val category = ProductCategory.values().find {
+        val category = ProductCategory.entries.find {
             it.displayName.equals(categoryInput, ignoreCase = true)
         }
         val results = productService.searchProducts(query, minPrice, maxPrice, category)

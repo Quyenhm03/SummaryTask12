@@ -34,4 +34,7 @@ class CustomerService(val customerRepository: CustomerRepository) {
         return customerRepository.findByType(type)
     }
 
+    fun deleteCustomerById(id: String) = customerRepository.deleteById(id)
+
+    fun findTopCustomers(limit: Int) = customerRepository.findTopCustomers(limit)
 }
