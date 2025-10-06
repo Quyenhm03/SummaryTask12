@@ -13,7 +13,7 @@ class Order(
     val id: String,
     val customer: Customer,
 ) : Reportable {
-    val items: MutableList<OrderItem> = mutableListOf()
+    var items: MutableList<OrderItem> = mutableListOf()
 
     @RequiresApi(Build.VERSION_CODES.O)
     var orderDate: LocalDateTime = LocalDateTime.now()
@@ -40,8 +40,6 @@ class Order(
             Result.failure(IllegalStateException("Stock not enough or invalid quantity"))
         }
     }
-
-//    fun getItems(): List<OrderItem> = items.toList()
 
     fun getSubtotal(): Double = items.sumOf { it.getSubtotal() }
 

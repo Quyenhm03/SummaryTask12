@@ -40,6 +40,9 @@ class CustomerController(
                 7 -> {
                     viewCustomerTypes()
                 }
+                8 -> {
+                    viewCustomerReport()
+                }
                 0 -> {
                     return
                 }
@@ -151,5 +154,28 @@ class CustomerController(
 
     private fun viewCustomerTypes() {
         outputHandler.printCustomerTypes(customerService)
+    }
+
+    private fun viewCustomerReport() {
+        outputHandler.printSuccess("\nView Customer Report")
+        val id = inputHandler.readLine("Enter Customer ID: ") ?: return
+
+        val customer = customerService.findById(id)
+        if (customer == null) {
+            outputHandler.printError("Customer not found")
+            return
+        }
+
+        val report = customer.generateReport()
+
+        println("\n" + "=".repeat(60))
+        println("CUSTOMER REPORT")
+        println("=".repeat(60))
+
+        report.forEach { (key, value) ->
+            println("${key.replaceFirstChar { it.uppercase() }}: $value")
+        }
+
+        println("=".repeat(60))
     }
 }

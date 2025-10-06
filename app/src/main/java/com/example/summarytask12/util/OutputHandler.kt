@@ -60,6 +60,7 @@ class OutputHandler {
         println("5. View All Customers")
         println("6. View Top Customers")
         println("7. View Customer Types")
+        println("8. View Customer Report by ID")
         println("0. Return to Main Menu")
     }
 
@@ -69,6 +70,8 @@ class OutputHandler {
         println("2. View All Orders")
         println("3. Find Order")
         println("4. Order Analytics")
+        println("5. View Order Report by ID")
+        println("6. View Order of Customer")
         println("0. Return to Main Menu")
     }
 

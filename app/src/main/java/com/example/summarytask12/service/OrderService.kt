@@ -20,19 +20,12 @@ class OrderService(
         } ?: Result.failure(NoSuchElementException("Customer not found"))
     }
 
-    fun addItemToOrder(orderId: String, productId: String, quantity: Int) {
-        val order = orderRepository.findById(orderId)
-        val product = productService.findById(productId)
+    fun addItemToOrder(orderId: String, productId: String, quantity: Int): Result<Order> {
+        val order = orderRepository.findById(orderId) ?: return Result.failure(NoSuchElementException("Order not found"))
+        val product = productService.findById(productId) ?: return Result.failure(NoSuchElementException("Product not found"))
 
-        if (order != null) {
-            if (product != null) {
-                order.addItem(product, quantity)
-            }
-        }
-
-        if (order != null) {
-            orderRepository.update(order)
-        }
+        order.addItem(product, quantity)
+        return orderRepository.update(order)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -55,6 +48,15 @@ class OrderService(
         order.customer.addOrder(order)
 
         return orderRepository.update(order)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun updateOrderStatus(orderId: String, newStatus: OrderStatus): Result<Order> {
+        val order = orderRepository.findById(orderId)
+            ?: return Result.failure(NoSuchElementException("Order not found"))
+
+        order.updateStatus(newStatus)
+        return orderRepository.updateStatus(order, newStatus)
     }
 
     fun findById(id: String): Order? = orderRepository.findById(id)

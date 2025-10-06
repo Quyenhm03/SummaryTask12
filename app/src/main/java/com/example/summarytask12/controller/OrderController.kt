@@ -18,12 +18,30 @@ class OrderController(
         while (true) {
             outputHandler.printOrderMenu()
             when (inputHandler.readInt("\nOption: ") ?: -1) {
-                1 -> createNewOrder()
-                2 -> viewAllOrders()
-                3 -> findOrder()
-                4 -> showOrderAnalytics()
-                0 -> return
-                else -> outputHandler.printError("Invalid option")
+                1 -> {
+                    createNewOrder()
+                }
+                2 -> {
+                    viewAllOrders()
+                }
+                3 -> {
+                    findOrder()
+                }
+                4 -> {
+                    showOrderAnalytics()
+                }
+                5 -> {
+                    viewOrderReport()
+                }
+                6 -> {
+                    viewOrderOfCustomer()
+                }
+                0 -> {
+                    return
+                }
+                else -> {
+                    outputHandler.printError("Invalid option")
+                }
             }
         }
     }
@@ -62,6 +80,13 @@ class OrderController(
         outputHandler.printAllOrders(orders)
     }
 
+    private fun viewOrderOfCustomer() {
+        outputHandler.printSuccess("\nView Orders of Customer")
+        val customerId = inputHandler.readLine("Customer ID: ") ?: return
+        val orders = orderService.getOrdersByCustomer(customerId)
+        outputHandler.printAllOrders(orders)
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     private fun findOrder() {
         outputHandler.printSuccess("\nFind Order")
@@ -79,5 +104,23 @@ class OrderController(
         val orders = orderService.findAll()
         val totalRevenue = orderService.getTotalRevenue()
         outputHandler.printOrderAnalytics(orders, totalRevenue)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun viewOrderReport() {
+        val orderId = inputHandler.readLine("Enter Order ID to view report: ") ?: return
+        val order = orderService.findById(orderId)
+        if (order != null) {
+            val report = order.generateReport()
+            println("\n" + "=".repeat(60))
+            println("ORDER REPORT")
+            println("=".repeat(60))
+            report.forEach { (key, value) ->
+                println("${key.padEnd(15)}: $value")
+            }
+            println("=".repeat(60))
+        } else {
+            outputHandler.printError("Order not found.")
+        }
     }
 }
