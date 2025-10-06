@@ -1,6 +1,8 @@
 package com.example.summarytask12.repository
 
 import com.example.summarytask12.extension.matches
+import com.example.summarytask12.model.product.Clothing
+import com.example.summarytask12.model.product.Electronic
 import com.example.summarytask12.model.product.Product
 import com.example.summarytask12.model.product.ProductCategory
 import com.example.summarytask12.util.DatabaseConnect
@@ -11,9 +13,23 @@ class ProductRepository {
     fun save(product: Product): Result<Product> {
         return try {
             products[product.id] = product
-            val query =
-                "INSERT INTO products (id, name, price, category, stock) VALUES " + "('${product.id}', '${product.name}', ${product.price}, '${product.category}', ${product.stock})"
-            DatabaseConnect.query(query)
+            val queryProduct = "INSERT INTO products (id, name, price, category, stock, description) VALUES " +
+                        "('${product.id}', '${product.name}', ${product.price}, '${product.category}', '${product.stock}', '${product.description}')"
+            DatabaseConnect.query(queryProduct)
+
+            when (product) {
+                is Electronic -> {
+                    val queryElectronic = "INSERT INTO electronics (productId, warrantyMonths) VALUES " +
+                                "('${product.id}', ${product.warrantyMonths})"
+                    DatabaseConnect.query(queryElectronic)
+                }
+                is Clothing -> {
+                    val queryClothing = "INSERT INTO clothing (productId, size, brand) VALUES " +
+                                "('${product.id}', '${product.size}', '${product.brand}')"
+                    DatabaseConnect.query(queryClothing)
+                }
+            }
+
             println("Product saved: ${product.name}")
             Result.success(product)
         } catch (e: Exception) {
@@ -21,16 +37,48 @@ class ProductRepository {
         }
     }
 
-    fun findById(id: String): Product? = products[id]
+    fun findById(id: String): Product? {
+        val query = "SELECT p.id, p.name, p.price, p.category, p.stock, p.description, e.warrantMonths, c. brand, c.size " +
+                    "FROM products p " +
+                    "LEFT JOIN electronics e ON p.id = e.productId " +
+                    "LEFT JOIN clothing c ON p.id = c.productId " +
+                    "WHERE p.id = '$id'"
+        DatabaseConnect.query(query)
+        return products[id] ?: return null
+    }
 
-    fun findAll(): List<Product> = products.values.toList()
+    fun findAll(): List<Product> {
+        val query = "SELECT p.id, p.name, p.price, p.category, p.stock, p.description, e.warrantMonths, c. brand, c.size " +
+                    "FROM products p " +
+                    "LEFT JOIN electronics e ON p.id = e.productId " +
+                    "LEFT JOIN clothing c ON p.id = c.productId "
+        DatabaseConnect.query(query)
+        return products.values.toList()
+    }
 
     fun update(product: Product): Result<Product> {
         return if (products.containsKey(product.id)) {
             products[product.id] = product
-            val query =
-                "UPDATE products SET name='${product.name}', price=${product.price}, stock=${product.stock} WHERE id='${product.id}'"
-            DatabaseConnect.query(query)
+            val queryProduct =
+                "UPDATE products SET name='${product.name}', price=${product.price}, stock=${product.stock}, description=${product.description} " +
+                        "WHERE id='${product.id}'"
+            DatabaseConnect.query(queryProduct)
+
+            when (product) {
+                is Electronic -> {
+                    val queryElectronic =
+                        "UPDATE electronics SET warrantyMonths=${product.warrantyMonths} " +
+                                "WHERE product_id='${product.id}'"
+                    DatabaseConnect.query(queryElectronic)
+                }
+                is Clothing -> {
+                    val queryClothing =
+                        "UPDATE clothing SET brand='${product.brand}', size='${product.size}' " +
+                                "WHERE product_id='${product.id}'"
+                    DatabaseConnect.query(queryClothing)
+                }
+            }
+
             Result.success(product)
         } else {
             Result.failure(NoSuchElementException("Product not found"))
@@ -43,10 +91,51 @@ class ProductRepository {
         maxPrice: Double? = null,
         category: ProductCategory? = null
     ): List<Product> {
+        var querySearch = "SELECT p.id, p.name, p.price, p.category, p.stock, p.description, " +
+                    "e.warrantyMonths, c.brand, c.size " +
+                    "FROM products p " +
+                    "LEFT JOIN electronics e ON p.id = e.productId " +
+                    "LEFT JOIN clothing c ON p.id = c.productId " +
+                    "WHERE 1=1 "
+
+        if (query.isNotBlank()) {
+            querySearch += "AND (p.name LIKE '%$query%' OR p.description LIKE '%$query%') "
+        }
+
+        if (minPrice != null) {
+            querySearch += "AND p.price >= $minPrice "
+        }
+
+        if (maxPrice != null) {
+            querySearch += "AND p.price <= $maxPrice "
+        }
+
+        if (category != null) {
+            querySearch += "AND p.category = '${category.name}' "
+        }
+
+        DatabaseConnect.query(querySearch)
         return products.values.filter { it.matches(query, minPrice, maxPrice, category) }
     }
 
     fun findByCategory(category: ProductCategory): List<Product> {
+        when (category) {
+            ProductCategory.ELECTRONIC -> {
+                val query = "SELECT p.id, p.name, p.price, p.category, p.stock, p.description, e.warrantMonths " +
+                            "FROM products p " +
+                            "LEFT JOIN electronics e ON p.id = e.productId " +
+                            "WHERE p.category =  '${category}'"
+                DatabaseConnect.query(query)
+            }
+
+            ProductCategory.CLOTHING -> {
+                val query = "SELECT p.id, p.name, p.price, p.category, p.stock, p.description, c. brand, c.size " +
+                            "FROM products p " +
+                            "LEFT JOIN clothing c ON p.id = c.productId " +
+                            "WHERE p.category =  '${category}'"
+                DatabaseConnect.query(query)
+            }
+        }
         return products.values.filter { it.category == category }
     }
 

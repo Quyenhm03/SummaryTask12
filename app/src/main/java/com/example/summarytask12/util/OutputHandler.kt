@@ -42,9 +42,10 @@ class OutputHandler {
         println("1. Add Electronic Product")
         println("2. Add Clothing Product")
         println("3. Search Products")
-        println("4. Update Product Stock")
-        println("5. Display Product Details")
-        println("6. Product Analytics")
+        println("4. Find Product By Category")
+        println("5. Update Product Stock")
+        println("6. Display Product Details")
+        println("7. Product Analytics")
         println("0. Return to Main Menu")
     }
 

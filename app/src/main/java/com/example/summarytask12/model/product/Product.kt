@@ -7,7 +7,8 @@ abstract class Product(
     val category: ProductCategory,
     var stock: Int = 0
 ) {
-    var description: String? = null
+    var description: String = ""
+        get() = generateDescription()
 
     fun updateStock(newStock: Int): Result<Unit> {
         return if (stock + newStock >= 0) {

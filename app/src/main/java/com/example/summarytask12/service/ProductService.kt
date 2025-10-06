@@ -46,4 +46,8 @@ class ProductService(val productRepository: ProductRepository) {
             categoryBreakdown = categoryBreakdown
         )
     }
+
+    fun findByCategory(category: ProductCategory): List<Product> {
+        return productRepository.findByCategory(category)
+    }
 }

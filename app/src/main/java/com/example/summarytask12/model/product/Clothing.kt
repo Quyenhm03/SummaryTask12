@@ -1,7 +1,5 @@
 package com.example.summarytask12.model.product
 
-import com.example.summarytask12.model.discount.DiscountContext
-
 class Clothing(
     id: String,
     name: String,

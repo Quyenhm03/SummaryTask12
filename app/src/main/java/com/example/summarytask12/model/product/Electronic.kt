@@ -29,8 +29,7 @@ class Electronic(
 
     fun extendWarranty(additionalMonths: Int): Result<Unit> {
         return if (additionalMonths > 0) {
-            warrantyMonths ?: 0
-            warrantyMonths = warrantyMonths!! + additionalMonths
+            warrantyMonths = (warrantyMonths ?: 0) + additionalMonths
             Result.success(Unit)
         } else {
             Result.failure(IllegalArgumentException("Additional warranty months invalid"))

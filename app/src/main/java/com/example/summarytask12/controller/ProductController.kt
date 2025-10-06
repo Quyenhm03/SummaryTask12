@@ -18,14 +18,33 @@ class ProductController(
         while (true) {
             outputHandler.printProductMenu()
             when (inputHandler.readInt("\nOption: ") ?: -1) {
-                1 -> addElectronicProduct()
-                2 -> addClothingProduct()
-                3 -> searchProducts()
-                4 -> updateProductStock()
-                5 -> displayProductDetails()
-                6 -> showProductAnalytics()
-                0 -> return
-                else -> outputHandler.printError("Invalid option")
+                1 -> {
+                    addElectronicProduct()
+                }
+                2 -> {
+                    addClothingProduct()
+                }
+                3 -> {
+                    searchProducts()
+                }
+                4 -> {
+                    findProductsByCategory()
+                }
+                5 -> {
+                    updateProductStock()
+                }
+                6 -> {
+                    displayProductDetails()
+                }
+                7 -> {
+                    showProductAnalytics()
+                }
+                0 -> {
+                    return
+                }
+                else -> {
+                    outputHandler.printError("Invalid option")
+                }
             }
         }
     }
@@ -128,5 +147,24 @@ class ProductController(
         outputHandler.printSuccess("\nProduct Analytics")
         val report = productService.generateInventoryReport()
         outputHandler.printProductAnalytics(report)
+    }
+
+    private fun findProductsByCategory() {
+        outputHandler.printSuccess("\nFind Products by Category")
+        outputHandler.printSuccess("Available categories: ${ProductCategory.entries.joinToString(", ") { it.displayName }}")
+        val categoryInput = inputHandler.readLine("Category: ") ?: return
+        val category = ProductCategory.entries.find {
+            it.displayName.equals(categoryInput, ignoreCase = true)
+        }
+        if (category == null) {
+            outputHandler.printError("Invalid category")
+            return
+        }
+        val results = productService.findByCategory(category)
+        if (results.isEmpty()) {
+            outputHandler.printError("No products found for category: ${category.displayName}")
+        } else {
+            outputHandler.printProductSearchResults(results)
+        }
     }
 }
