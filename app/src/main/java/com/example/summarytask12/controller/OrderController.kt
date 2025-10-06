@@ -21,24 +21,31 @@ class OrderController(
                 1 -> {
                     createNewOrder()
                 }
+
                 2 -> {
                     viewAllOrders()
                 }
+
                 3 -> {
                     findOrder()
                 }
+
                 4 -> {
                     showOrderAnalytics()
                 }
+
                 5 -> {
                     viewOrderReport()
                 }
+
                 6 -> {
                     viewOrderOfCustomer()
                 }
+
                 0 -> {
                     return
                 }
+
                 else -> {
                     outputHandler.printError("Invalid option")
                 }
@@ -63,7 +70,11 @@ class OrderController(
             if (processOrder?.lowercase() == "y") {
                 orderService.processOrder(order.id).onSuccess { processedOrder ->
                     outputHandler.printSuccess("Order processed successfully!")
-                    outputHandler.printSuccess("Total Amount: ${processedOrder.getTotalAmount().toInt()} VND")
+                    outputHandler.printSuccess(
+                        "Total Amount: ${
+                            processedOrder.getTotalAmount().toInt()
+                        } VND"
+                    )
                     StoreApplication.currentRevenue += processedOrder.getTotalAmount()
                 }.onFailure {
                     outputHandler.printError("Error processing order: ${it.message}")

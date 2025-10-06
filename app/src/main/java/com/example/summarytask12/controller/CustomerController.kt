@@ -22,30 +22,39 @@ class CustomerController(
                 1 -> {
                     createNewCustomer()
                 }
+
                 2 -> {
                     findCustomer()
                 }
+
                 3 -> {
                     updateCustomer()
                 }
+
                 4 -> {
                     deleteCustomer()
                 }
+
                 5 -> {
                     viewAllCustomers()
                 }
+
                 6 -> {
                     viewTopCustomers()
                 }
+
                 7 -> {
                     viewCustomerTypes()
                 }
+
                 8 -> {
                     viewCustomerReport()
                 }
+
                 0 -> {
                     return
                 }
+
                 else -> {
                     outputHandler.printError("Invalid option")
                 }
@@ -96,7 +105,8 @@ class CustomerController(
         }
 
         val newEmail = inputHandler.readLine("New Email (${existing.email}): ") ?: existing.email
-        val newPhone = inputHandler.readLine("New Phone (${existing.phone ?: "N/A"}): ") ?: existing.phone
+        val newPhone =
+            inputHandler.readLine("New Phone (${existing.phone ?: "N/A"}): ") ?: existing.phone
         val street = inputHandler.readLine("Street: ") ?: return
         val city = inputHandler.readLine("City: ") ?: return
         val country = inputHandler.readLine("Country (default: Vietnam): ") ?: "Vietnam"

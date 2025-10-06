@@ -229,7 +229,11 @@ class OutputHandler {
             println("\nFound ${orders.size} orders:")
             println("-".repeat(80))
             orders.forEach { order ->
-                println("${order.id} | ${order.customer.name} | ${order.status} | ${order.getTotalAmount().toInt()} VND")
+                println(
+                    "${order.id} | ${order.customer.name} | ${order.status} | ${
+                        order.getTotalAmount().toInt()
+                    } VND"
+                )
             }
             println("-".repeat(80))
         }

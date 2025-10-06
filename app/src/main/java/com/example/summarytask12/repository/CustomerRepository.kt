@@ -10,14 +10,15 @@ class CustomerRepository {
     fun save(customer: Customer): Result<Customer> {
         return try {
             customers[customer.id] = customer
-            val queryCustomer = "INSERT INTO customers (id, name, email, phone, type, total_spent) " +
-                                "VALUES ('${customer.id}', '${customer.name}', '${customer.email}' " +
-                                ", '${customer.phone ?: ""}', '${customer.customerType.name}', '${customer.totalSpent}')"
+            val queryCustomer =
+                "INSERT INTO customers (id, name, email, phone, type, total_spent) " +
+                        "VALUES ('${customer.id}', '${customer.name}', '${customer.email}' " +
+                        ", '${customer.phone ?: ""}', '${customer.customerType.name}', '${customer.totalSpent}')"
             DatabaseConnect.query(queryCustomer)
 
             customer.address?.let { addr ->
                 val queryAddress = "INSERT INTO address (customerId, street, city, country) " +
-                                    "VALUES ('${customer.id}', '${addr.street}', '${addr.city}', '${addr.country}')"
+                        "VALUES ('${customer.id}', '${addr.street}', '${addr.city}', '${addr.country}')"
                 DatabaseConnect.query(queryAddress)
             }
 
@@ -44,14 +45,16 @@ class CustomerRepository {
     fun update(customer: Customer): Result<Customer> {
         return if (customers.containsKey(customer.id)) {
             customers[customer.id] = customer
-            val queryCustomer = "UPDATE customers SET name='${customer.name}', email='${customer.email}', " +
-                                "phone='${customer.phone ?: ""}', type='${customer.customerType.name}', " +
-                                "total_spent=${customer.totalSpent} WHERE id='${customer.id}'"
+            val queryCustomer =
+                "UPDATE customers SET name='${customer.name}', email='${customer.email}', " +
+                        "phone='${customer.phone ?: ""}', type='${customer.customerType.name}', " +
+                        "total_spent=${customer.totalSpent} WHERE id='${customer.id}'"
             DatabaseConnect.query(queryCustomer)
 
             customer.address?.let { addr ->
-                val queryAddress = "UPDATE address SET street='${addr.street}', city='${addr.city}', " +
-                        "country='${addr.country}' WHERE id='${customer.id}'"
+                val queryAddress =
+                    "UPDATE address SET street='${addr.street}', city='${addr.city}', " +
+                            "country='${addr.country}' WHERE id='${customer.id}'"
                 DatabaseConnect.query(queryAddress)
             }
 

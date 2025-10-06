@@ -59,22 +59,23 @@ class ProductService(val productRepository: ProductRepository) {
         return productRepository.findByCategory(category)
     }
 
-    suspend fun updateStockAsync(updates: Map<String, Int>) : Result<List<Product>> = coroutineScope {
-        try {
-            val results = updates.map { (productId, adjustment) ->
-                async {
-                    updateStock(productId, adjustment)
-                }
-            }.awaitAll()
+    suspend fun updateStockAsync(updates: Map<String, Int>): Result<List<Product>> =
+        coroutineScope {
+            try {
+                val results = updates.map { (productId, adjustment) ->
+                    async {
+                        updateStock(productId, adjustment)
+                    }
+                }.awaitAll()
 
-            val failures = results.filter { it.isFailure }
-            if (failures.isEmpty()) {
-                Result.success(results.mapNotNull { it.getOrNull() })
-            } else {
-                Result.failure(Exception("Some stock updates failed"))
+                val failures = results.filter { it.isFailure }
+                if (failures.isEmpty()) {
+                    Result.success(results.mapNotNull { it.getOrNull() })
+                } else {
+                    Result.failure(Exception("Some stock updates failed"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
             }
-        } catch (e: Exception) {
-            Result.failure(e)
         }
-    }
 }

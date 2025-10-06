@@ -45,6 +45,7 @@ class MenuController(
                     DatabaseConnect.disconnect()
                     exitProcess(0)
                 }
+
                 else -> outputHandler.printError("Invalid option, please try again.")
             }
 

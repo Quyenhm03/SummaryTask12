@@ -21,21 +21,24 @@ class ProductRepository {
             delay(500)
 
             products[product.id] = product
-            val queryProduct = "INSERT INTO products (id, name, price, category, stock, description) VALUES " +
+            val queryProduct =
+                "INSERT INTO products (id, name, price, category, stock, description) VALUES " +
                         "('${product.id}', '${product.name}', ${product.price}, '${product.category}', '${product.stock}', '${product.description}')"
             DatabaseConnect.query(queryProduct)
 
             when (product) {
                 is Electronic -> {
                     delay(200)
-                    val queryElectronic = "INSERT INTO electronics (productId, warrantyMonths) VALUES " +
+                    val queryElectronic =
+                        "INSERT INTO electronics (productId, warrantyMonths) VALUES " +
                                 "('${product.id}', ${product.warrantyMonths})"
                     DatabaseConnect.query(queryElectronic)
                 }
+
                 is Clothing -> {
                     delay(200)
                     val queryClothing = "INSERT INTO clothing (productId, size, brand) VALUES " +
-                                "('${product.id}', '${product.size}', '${product.brand}')"
+                            "('${product.id}', '${product.size}', '${product.brand}')"
                     DatabaseConnect.query(queryClothing)
                 }
             }
@@ -50,7 +53,8 @@ class ProductRepository {
     suspend fun findById(id: String): Product? = withContext(dispatcher) {
         delay(300)
 
-        val query = "SELECT p.id, p.name, p.price, p.category, p.stock, p.description, e.warrantMonths, c. brand, c.size " +
+        val query =
+            "SELECT p.id, p.name, p.price, p.category, p.stock, p.description, e.warrantMonths, c. brand, c.size " +
                     "FROM products p " +
                     "LEFT JOIN electronics e ON p.id = e.productId " +
                     "LEFT JOIN clothing c ON p.id = c.productId " +
@@ -62,7 +66,8 @@ class ProductRepository {
     suspend fun findAll(): List<Product> = withContext(dispatcher) {
         delay(500)
 
-        val query = "SELECT p.id, p.name, p.price, p.category, p.stock, p.description, e.warrantMonths, c. brand, c.size " +
+        val query =
+            "SELECT p.id, p.name, p.price, p.category, p.stock, p.description, e.warrantMonths, c. brand, c.size " +
                     "FROM products p " +
                     "LEFT JOIN electronics e ON p.id = e.productId " +
                     "LEFT JOIN clothing c ON p.id = c.productId "
@@ -88,6 +93,7 @@ class ProductRepository {
                                 "WHERE product_id='${product.id}'"
                     DatabaseConnect.query(queryElectronic)
                 }
+
                 is Clothing -> {
                     delay(200)
                     val queryClothing =
@@ -112,11 +118,11 @@ class ProductRepository {
         delay(600)
 
         var querySearch = "SELECT p.id, p.name, p.price, p.category, p.stock, p.description, " +
-                    "e.warrantyMonths, c.brand, c.size " +
-                    "FROM products p " +
-                    "LEFT JOIN electronics e ON p.id = e.productId " +
-                    "LEFT JOIN clothing c ON p.id = c.productId " +
-                    "WHERE 1=1 "
+                "e.warrantyMonths, c.brand, c.size " +
+                "FROM products p " +
+                "LEFT JOIN electronics e ON p.id = e.productId " +
+                "LEFT JOIN clothing c ON p.id = c.productId " +
+                "WHERE 1=1 "
 
         if (query.isNotBlank()) {
             querySearch += "AND (p.name LIKE '%$query%' OR p.description LIKE '%$query%') "
@@ -143,7 +149,8 @@ class ProductRepository {
 
         when (category) {
             ProductCategory.ELECTRONIC -> {
-                val query = "SELECT p.id, p.name, p.price, p.category, p.stock, p.description, e.warrantMonths " +
+                val query =
+                    "SELECT p.id, p.name, p.price, p.category, p.stock, p.description, e.warrantMonths " +
                             "FROM products p " +
                             "LEFT JOIN electronics e ON p.id = e.productId " +
                             "WHERE p.category =  '${category}'"
@@ -151,7 +158,8 @@ class ProductRepository {
             }
 
             ProductCategory.CLOTHING -> {
-                val query = "SELECT p.id, p.name, p.price, p.category, p.stock, p.description, c. brand, c.size " +
+                val query =
+                    "SELECT p.id, p.name, p.price, p.category, p.stock, p.description, c. brand, c.size " +
                             "FROM products p " +
                             "LEFT JOIN clothing c ON p.id = c.productId " +
                             "WHERE p.category =  '${category}'"
@@ -161,25 +169,26 @@ class ProductRepository {
         products.values.filter { it.category == category }
     }
 
-    suspend fun saveBatch(productList: List<Product>) :  Result<List<Product>> = withContext(dispatcher) {
-        try {
-            val results = productList.map { product ->
-                async {
-                    save(product)
-                }
-            }.awaitAll()
+    suspend fun saveBatch(productList: List<Product>): Result<List<Product>> =
+        withContext(dispatcher) {
+            try {
+                val results = productList.map { product ->
+                    async {
+                        save(product)
+                    }
+                }.awaitAll()
 
-            val failures = results.filter {
-                it.isFailure
+                val failures = results.filter {
+                    it.isFailure
+                }
+                if (failures.isEmpty()) {
+                    Result.success(productList)
+                } else {
+                    Result.failure(Exception("Some products failed to save!"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
             }
-            if (failures.isEmpty()) {
-                Result.success(productList)
-            } else {
-                Result.failure(Exception("Some products failed to save!"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
         }
-    }
 
 }

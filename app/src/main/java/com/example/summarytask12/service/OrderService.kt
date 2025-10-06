@@ -21,8 +21,12 @@ class OrderService(
     }
 
     suspend fun addItemToOrder(orderId: String, productId: String, quantity: Int): Result<Order> {
-        val order = orderRepository.findById(orderId) ?: return Result.failure(NoSuchElementException("Order not found"))
-        val product = productService.findById(productId) ?: return Result.failure(NoSuchElementException("Product not found"))
+        val order = orderRepository.findById(orderId) ?: return Result.failure(
+            NoSuchElementException("Order not found")
+        )
+        val product = productService.findById(productId) ?: return Result.failure(
+            NoSuchElementException("Product not found")
+        )
 
         order.addItem(product, quantity)
         return orderRepository.update(order)

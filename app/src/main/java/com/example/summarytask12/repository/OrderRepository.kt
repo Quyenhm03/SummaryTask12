@@ -21,8 +21,9 @@ class OrderRepository {
             println("Order saved: ${order.id}")
 
             order.items.forEach { item ->
-                val itemQuery = "INSERT INTO order_items (orderId, productId, quantity, subtotal) " +
-                        "VALUES ('${order.id}', '${item.product.id}', ${item.quantity}, ${item.getSubtotal()})"
+                val itemQuery =
+                    "INSERT INTO order_items (orderId, productId, quantity, subtotal) " +
+                            "VALUES ('${order.id}', '${item.product.id}', ${item.quantity}, ${item.getSubtotal()})"
                 DatabaseConnect.query(itemQuery)
                 println("Added item: ${item.product.name} x${item.quantity}")
             }
@@ -55,7 +56,8 @@ class OrderRepository {
             orders[order.id] = order
             orderItems[order.id] = order.items
 
-            val query = "UPDATE orders SET status='${order.status.name}', total_amount=${order.getTotalAmount()} WHERE id='${order.id}'"
+            val query =
+                "UPDATE orders SET status='${order.status.name}', total_amount=${order.getTotalAmount()} WHERE id='${order.id}'"
             DatabaseConnect.query(query)
 
             DatabaseConnect.query("DELETE FROM order_items WHERE orderId='${order.id}'")
@@ -111,7 +113,7 @@ class OrderRepository {
     fun getTotalRevenue(): Double {
         val query = "SELECT SUM(totalAmount) AS totalRevenue FROM orders"
         DatabaseConnect.query(query)
-        return  orders.values.sumOf { it.getTotalAmount() }
+        return orders.values.sumOf { it.getTotalAmount() }
     }
 
     fun findByCustomer(customerId: String): List<Order> {

@@ -38,10 +38,18 @@ class StoreApplication {
 
     val productController = ProductController(productService, inputHandler, outputHandler)
     val customerController = CustomerController(customerService, inputHandler, outputHandler)
-    val reportController = ReportController(productService, orderService, inputHandler, outputHandler)
+    val reportController =
+        ReportController(productService, orderService, inputHandler, outputHandler)
     val orderController = OrderController(orderService, inputHandler, outputHandler)
 
-    val menuController = MenuController(productController, customerController, orderController, reportController, inputHandler, outputHandler)
+    val menuController = MenuController(
+        productController,
+        customerController,
+        orderController,
+        reportController,
+        inputHandler,
+        outputHandler
+    )
 
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun run() {

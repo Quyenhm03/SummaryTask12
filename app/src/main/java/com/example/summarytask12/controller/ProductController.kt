@@ -25,30 +25,39 @@ class ProductController(
                 1 -> {
                     addElectronicProduct()
                 }
+
                 2 -> {
                     addClothingProduct()
                 }
+
                 3 -> {
                     searchProducts()
                 }
+
                 4 -> {
                     findProductsByCategory()
                 }
+
                 5 -> {
                     updateProductStock()
                 }
+
                 6 -> {
                     displayProductDetails()
                 }
+
                 7 -> {
                     showProductAnalytics()
                 }
+
                 8 -> {
                     updateStockAsync()
                 }
+
                 0 -> {
                     return@runBlocking
                 }
+
                 else -> {
                     outputHandler.printError("Invalid option")
                 }
@@ -139,7 +148,8 @@ class ProductController(
 
         outputHandler.printSuccess("Current product: ${product.name}")
         outputHandler.printSuccess("Current stock: ${product.stock}")
-        val adjustment = inputHandler.readInt("Stock adjustment (+ to add, - to remove): ") ?: return
+        val adjustment =
+            inputHandler.readInt("Stock adjustment (+ to add, - to remove): ") ?: return
 
         outputHandler.printSuccess("Updating stock...")
         productService.updateStock(productId, adjustment).onSuccess { updatedProduct ->
