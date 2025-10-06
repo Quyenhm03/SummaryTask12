@@ -44,7 +44,7 @@ class StoreApplication {
     val menuController = MenuController(productController, customerController, orderController, reportController, inputHandler, outputHandler)
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun run() {
+    suspend fun run() {
         println("=== Welcome to Store Management System ===")
 
         DatabaseConnect.connect()
@@ -60,7 +60,7 @@ class StoreApplication {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun initializeData() {
+    suspend fun initializeData() {
         println("Initializing data...")
 
         val laptop = Electronic("ELEC-001", "Dell XPS 13", 25000000.0, 24).apply {
@@ -97,6 +97,6 @@ class StoreApplication {
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-fun main() {
+suspend fun main() {
     StoreApplication().run()
 }

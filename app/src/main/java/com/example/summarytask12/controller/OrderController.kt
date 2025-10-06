@@ -14,7 +14,7 @@ class OrderController(
 ) {
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun orderManagement() {
+    suspend fun orderManagement() {
         while (true) {
             outputHandler.printOrderMenu()
             when (inputHandler.readInt("\nOption: ") ?: -1) {
@@ -47,7 +47,7 @@ class OrderController(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun createNewOrder() {
+    suspend private fun createNewOrder() {
         outputHandler.printSuccess("\nCreate New Order")
         val customerId = inputHandler.readLine("Customer ID: ") ?: return
         orderService.createOrder(customerId).onSuccess { order ->

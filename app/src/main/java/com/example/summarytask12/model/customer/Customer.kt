@@ -87,9 +87,11 @@ class Customer(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun sendNotification(message: String) {
+    fun sendNotification(message: String, format: (String, String, String) -> String = { id, name, mes ->
         val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
-        println("[$timestamp] for $name ($id): $message")
+        "[$timestamp] for $name ($id): $message"
+    }) {
+        println(format(id, name, message))
     }
 
     private fun getAverageOrderValue(): Double {

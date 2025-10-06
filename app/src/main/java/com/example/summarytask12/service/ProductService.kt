@@ -3,22 +3,28 @@ package com.example.summarytask12.service
 import com.example.summarytask12.model.product.Product
 import com.example.summarytask12.model.product.ProductCategory
 import com.example.summarytask12.repository.ProductRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 class ProductService(val productRepository: ProductRepository) {
 
-    fun create(product: Product): Result<Product> {
+    suspend fun create(product: Product): Result<Product> {
         return productRepository.save(product)
     }
 
-    fun findById(id: String): Product? = productRepository.findById(id)
+    suspend fun findById(id: String): Product? = productRepository.findById(id)
 
-    fun findAll(): List<Product> = productRepository.findAll()
+    suspend fun findAll(): List<Product> = productRepository.findAll()
 
-    fun update(product: Product): Result<Product> {
+    suspend fun update(product: Product): Result<Product> {
         return productRepository.update(product)
     }
 
-    fun searchProducts(
+    suspend fun searchProducts(
         query: String,
         minPrice: Double? = null,
         maxPrice: Double? = null,
@@ -27,7 +33,7 @@ class ProductService(val productRepository: ProductRepository) {
         return productRepository.search(query, minPrice, maxPrice, category)
     }
 
-    fun updateStock(productId: String, adjustment: Int): Result<Product> {
+    suspend fun updateStock(productId: String, adjustment: Int): Result<Product> {
         return findById(productId)?.let { product ->
             product.updateStock(adjustment).map {
                 productRepository.update(product)
@@ -36,18 +42,39 @@ class ProductService(val productRepository: ProductRepository) {
         } ?: Result.failure(NoSuchElementException("Product not found"))
     }
 
-    fun generateInventoryReport(): InventoryReport {
+    suspend fun generateInventoryReport(): InventoryReport = withContext(Dispatchers.Default) {
+        delay(500)
+
         val allProducts = findAll()
         val categoryBreakdown = allProducts.groupingBy { it.category }.eachCount()
 
-        return InventoryReport(
+        InventoryReport(
             totalProducts = allProducts.size,
             totalValue = allProducts.sumOf { it.price * it.stock },
             categoryBreakdown = categoryBreakdown
         )
     }
 
-    fun findByCategory(category: ProductCategory): List<Product> {
+    suspend fun findByCategory(category: ProductCategory): List<Product> {
         return productRepository.findByCategory(category)
+    }
+
+    suspend fun updateStockAsync(updates: Map<String, Int>) : Result<List<Product>> = coroutineScope {
+        try {
+            val results = updates.map { (productId, adjustment) ->
+                async {
+                    updateStock(productId, adjustment)
+                }
+            }.awaitAll()
+
+            val failures = results.filter { it.isFailure }
+            if (failures.isEmpty()) {
+                Result.success(results.mapNotNull { it.getOrNull() })
+            } else {
+                Result.failure(Exception("Some stock updates failed"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }

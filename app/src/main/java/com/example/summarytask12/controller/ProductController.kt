@@ -7,6 +7,10 @@ import com.example.summarytask12.model.product.ProductCategory
 import com.example.summarytask12.service.ProductService
 import com.example.summarytask12.util.InputHandler
 import com.example.summarytask12.util.OutputHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class ProductController(
     private val productService: ProductService,
@@ -14,7 +18,7 @@ class ProductController(
     private val outputHandler: OutputHandler
 ) {
 
-    fun productManagement() {
+    fun productManagement() = runBlocking {
         while (true) {
             outputHandler.printProductMenu()
             when (inputHandler.readInt("\nOption: ") ?: -1) {
@@ -39,8 +43,11 @@ class ProductController(
                 7 -> {
                     showProductAnalytics()
                 }
+                8 -> {
+                    updateStockAsync()
+                }
                 0 -> {
-                    return
+                    return@runBlocking
                 }
                 else -> {
                     outputHandler.printError("Invalid option")
@@ -49,7 +56,7 @@ class ProductController(
         }
     }
 
-    private fun addElectronicProduct() {
+    private suspend fun addElectronicProduct() {
         outputHandler.printSuccess("\nAdd Electronic Product")
         val id = inputHandler.readLine("Product ID: ") ?: return
         val name = inputHandler.readLine("Product Name: ") ?: return
@@ -60,6 +67,8 @@ class ProductController(
         try {
             val product = Electronic(id, name, price, warranty)
             product.updateStock(stock)
+
+            outputHandler.printSuccess("Saving to database ...")
             productService.create(product).onSuccess {
                 outputHandler.printSuccess("Electronic product added successfully!")
             }.onFailure {
@@ -70,7 +79,7 @@ class ProductController(
         }
     }
 
-    private fun addClothingProduct() {
+    private suspend fun addClothingProduct() {
         outputHandler.printSuccess("\nAdd Clothing Product")
         val id = inputHandler.readLine("Product ID: ") ?: return
         val name = inputHandler.readLine("Product Name: ") ?: return
@@ -89,6 +98,8 @@ class ProductController(
         try {
             val product = Clothing(id, name, price, size, brand)
             product.updateStock(stock)
+
+            outputHandler.printSuccess("Saving to database ...")
             productService.create(product).onSuccess {
                 outputHandler.printSuccess("Clothing product added successfully!")
             }.onFailure {
@@ -99,7 +110,7 @@ class ProductController(
         }
     }
 
-    private fun searchProducts() {
+    private suspend fun searchProducts() {
         outputHandler.printSuccess("\nProduct Search")
         val query = inputHandler.readLine("Search query: ") ?: return
         val minPrice = inputHandler.readDouble("Minimum price (optional): ")
@@ -109,21 +120,28 @@ class ProductController(
         val category = ProductCategory.entries.find {
             it.displayName.equals(categoryInput, ignoreCase = true)
         }
+
+        outputHandler.printSuccess("Searching database ...")
         val results = productService.searchProducts(query, minPrice, maxPrice, category)
         outputHandler.printProductSearchResults(results)
     }
 
-    private fun updateProductStock() {
+    private suspend fun updateProductStock() {
         outputHandler.printSuccess("\nUpdate Product Stock")
         val productId = inputHandler.readLine("Product ID: ") ?: return
+
+        outputHandler.printSuccess("Loading product...")
         val product = productService.findById(productId)
         if (product == null) {
             outputHandler.printError("Product not found")
             return
         }
+
         outputHandler.printSuccess("Current product: ${product.name}")
         outputHandler.printSuccess("Current stock: ${product.stock}")
         val adjustment = inputHandler.readInt("Stock adjustment (+ to add, - to remove): ") ?: return
+
+        outputHandler.printSuccess("Updating stock...")
         productService.updateStock(productId, adjustment).onSuccess { updatedProduct ->
             outputHandler.printSuccess("Stock updated successfully!")
             outputHandler.printSuccess("New stock level: ${updatedProduct.stock}")
@@ -132,9 +150,11 @@ class ProductController(
         }
     }
 
-    private fun displayProductDetails() {
+    private suspend fun displayProductDetails() {
         outputHandler.printSuccess("\nProduct Details")
         val productId = inputHandler.readLine("Product ID: ") ?: return
+
+        outputHandler.printSuccess("Loading product details ...")
         val product = productService.findById(productId)
         if (product == null) {
             outputHandler.printError("Product not found")
@@ -143,13 +163,14 @@ class ProductController(
         outputHandler.printProductDetails(product)
     }
 
-    private fun showProductAnalytics() {
+    private suspend fun showProductAnalytics() {
         outputHandler.printSuccess("\nProduct Analytics")
+        outputHandler.printSuccess("Generating inventory report ...")
         val report = productService.generateInventoryReport()
         outputHandler.printProductAnalytics(report)
     }
 
-    private fun findProductsByCategory() {
+    private suspend fun findProductsByCategory() {
         outputHandler.printSuccess("\nFind Products by Category")
         outputHandler.printSuccess("Available categories: ${ProductCategory.entries.joinToString(", ") { it.displayName }}")
         val categoryInput = inputHandler.readLine("Category: ") ?: return
@@ -160,11 +181,37 @@ class ProductController(
             outputHandler.printError("Invalid category")
             return
         }
+
+        outputHandler.printSuccess("Loading products ...")
         val results = productService.findByCategory(category)
         if (results.isEmpty()) {
             outputHandler.printError("No products found for category: ${category.displayName}")
         } else {
             outputHandler.printProductSearchResults(results)
+        }
+    }
+
+    private suspend fun updateStockAsync() {
+        outputHandler.printSuccess("\nUpdate Stock Async")
+        val updates = mutableMapOf<String, Int>()
+
+        while (true) {
+            val productId = inputHandler.readLine("Product ID (empty to finish): ") ?: break
+            val adjustment = inputHandler.readInt("Adjustment: ") ?: continue
+
+            updates[productId] = adjustment
+        }
+
+        if (updates.isEmpty()) {
+            outputHandler.printError("No updates")
+            return
+        }
+
+        outputHandler.printSuccess("Processing ${updates.size} updates in parallel ...")
+        productService.updateStockAsync(updates).onSuccess { updatedProducts ->
+            outputHandler.printSuccess("Successfully updated ${updatedProducts.size} products!")
+        }.onFailure {
+            outputHandler.printError("Error: ${it.message}")
         }
     }
 }

@@ -6,12 +6,20 @@ import com.example.summarytask12.model.product.Electronic
 import com.example.summarytask12.model.product.Product
 import com.example.summarytask12.model.product.ProductCategory
 import com.example.summarytask12.util.DatabaseConnect
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 class ProductRepository {
     val products: MutableMap<String, Product> = mutableMapOf()
+    private val dispatcher = Dispatchers.IO
 
-    fun save(product: Product): Result<Product> {
-        return try {
+    suspend fun save(product: Product): Result<Product> = withContext(dispatcher) {
+        try {
+            delay(500)
+
             products[product.id] = product
             val queryProduct = "INSERT INTO products (id, name, price, category, stock, description) VALUES " +
                         "('${product.id}', '${product.name}', ${product.price}, '${product.category}', '${product.stock}', '${product.description}')"
@@ -19,11 +27,13 @@ class ProductRepository {
 
             when (product) {
                 is Electronic -> {
+                    delay(200)
                     val queryElectronic = "INSERT INTO electronics (productId, warrantyMonths) VALUES " +
                                 "('${product.id}', ${product.warrantyMonths})"
                     DatabaseConnect.query(queryElectronic)
                 }
                 is Clothing -> {
+                    delay(200)
                     val queryClothing = "INSERT INTO clothing (productId, size, brand) VALUES " +
                                 "('${product.id}', '${product.size}', '${product.brand}')"
                     DatabaseConnect.query(queryClothing)
@@ -37,27 +47,33 @@ class ProductRepository {
         }
     }
 
-    fun findById(id: String): Product? {
+    suspend fun findById(id: String): Product? = withContext(dispatcher) {
+        delay(300)
+
         val query = "SELECT p.id, p.name, p.price, p.category, p.stock, p.description, e.warrantMonths, c. brand, c.size " +
                     "FROM products p " +
                     "LEFT JOIN electronics e ON p.id = e.productId " +
                     "LEFT JOIN clothing c ON p.id = c.productId " +
                     "WHERE p.id = '$id'"
         DatabaseConnect.query(query)
-        return products[id] ?: return null
+        products[id]
     }
 
-    fun findAll(): List<Product> {
+    suspend fun findAll(): List<Product> = withContext(dispatcher) {
+        delay(500)
+
         val query = "SELECT p.id, p.name, p.price, p.category, p.stock, p.description, e.warrantMonths, c. brand, c.size " +
                     "FROM products p " +
                     "LEFT JOIN electronics e ON p.id = e.productId " +
                     "LEFT JOIN clothing c ON p.id = c.productId "
         DatabaseConnect.query(query)
-        return products.values.toList()
+        products.values.toList()
     }
 
-    fun update(product: Product): Result<Product> {
-        return if (products.containsKey(product.id)) {
+    suspend fun update(product: Product): Result<Product> = withContext(dispatcher) {
+        if (products.containsKey(product.id)) {
+            delay(400)
+
             products[product.id] = product
             val queryProduct =
                 "UPDATE products SET name='${product.name}', price=${product.price}, stock=${product.stock}, description=${product.description} " +
@@ -66,12 +82,14 @@ class ProductRepository {
 
             when (product) {
                 is Electronic -> {
+                    delay(200)
                     val queryElectronic =
                         "UPDATE electronics SET warrantyMonths=${product.warrantyMonths} " +
                                 "WHERE product_id='${product.id}'"
                     DatabaseConnect.query(queryElectronic)
                 }
                 is Clothing -> {
+                    delay(200)
                     val queryClothing =
                         "UPDATE clothing SET brand='${product.brand}', size='${product.size}' " +
                                 "WHERE product_id='${product.id}'"
@@ -85,12 +103,14 @@ class ProductRepository {
         }
     }
 
-    fun search(
+    suspend fun search(
         query: String,
         minPrice: Double? = null,
         maxPrice: Double? = null,
         category: ProductCategory? = null
-    ): List<Product> {
+    ): List<Product> = withContext(dispatcher) {
+        delay(600)
+
         var querySearch = "SELECT p.id, p.name, p.price, p.category, p.stock, p.description, " +
                     "e.warrantyMonths, c.brand, c.size " +
                     "FROM products p " +
@@ -115,10 +135,12 @@ class ProductRepository {
         }
 
         DatabaseConnect.query(querySearch)
-        return products.values.filter { it.matches(query, minPrice, maxPrice, category) }
+        products.values.filter { it.matches(query, minPrice, maxPrice, category) }
     }
 
-    fun findByCategory(category: ProductCategory): List<Product> {
+    suspend fun findByCategory(category: ProductCategory): List<Product> = withContext(dispatcher) {
+        delay(400)
+
         when (category) {
             ProductCategory.ELECTRONIC -> {
                 val query = "SELECT p.id, p.name, p.price, p.category, p.stock, p.description, e.warrantMonths " +
@@ -136,7 +158,28 @@ class ProductRepository {
                 DatabaseConnect.query(query)
             }
         }
-        return products.values.filter { it.category == category }
+        products.values.filter { it.category == category }
+    }
+
+    suspend fun saveBatch(productList: List<Product>) :  Result<List<Product>> = withContext(dispatcher) {
+        try {
+            val results = productList.map { product ->
+                async {
+                    save(product)
+                }
+            }.awaitAll()
+
+            val failures = results.filter {
+                it.isFailure
+            }
+            if (failures.isEmpty()) {
+                Result.success(productList)
+            } else {
+                Result.failure(Exception("Some products failed to save!"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
 }

@@ -12,7 +12,7 @@ class ReportController(
     private val outputHandler: OutputHandler
 ) {
 
-    fun reportsAndAnalytics() {
+    suspend fun reportsAndAnalytics() {
         while (true) {
             outputHandler.printReportsMenu()
             when (inputHandler.readInt("\nOption: ") ?: -1) {
@@ -25,7 +25,7 @@ class ReportController(
         }
     }
 
-    private fun showInventoryReport() {
+    private suspend fun showInventoryReport() {
         outputHandler.printSuccess("\nInventory Report")
         val report = productService.generateInventoryReport()
         outputHandler.printInventoryReport(report)

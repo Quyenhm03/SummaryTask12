@@ -30,7 +30,7 @@ class MenuController(
 ) {
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun showMainMenu() {
+    suspend fun showMainMenu() {
         while (true) {
             outputHandler.printMainMenu(StoreApplication.currentRevenue)
             val choice = inputHandler.readInt("Choose an option (1-5): ") ?: 0

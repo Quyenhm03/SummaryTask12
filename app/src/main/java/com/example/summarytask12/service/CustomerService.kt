@@ -11,7 +11,10 @@ class CustomerService(val customerRepository: CustomerRepository) {
     @RequiresApi(Build.VERSION_CODES.O)
     fun create(customer: Customer): Result<Customer> {
         return customerRepository.save(customer).onSuccess { savedCustomer ->
-            savedCustomer.sendNotification("Welcome to our store!")
+            savedCustomer.sendNotification(
+                "Welcome to our store!",
+                format = { id, name, msg -> "[$id] Hello $name: $msg" }
+            )
         }
     }
 
