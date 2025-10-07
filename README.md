@@ -94,6 +94,13 @@ Mục tiêu: hỗ trợ **quản lý sản phẩm**, **khách hàng**, và **đ�
   <img src="images/project-structure.png" alt="Cấu trúc dự án" width="500"/>
 </p>
 
+- **Controller**: Nhận yêu cầu từ người dùng, điều phối các thao tác.  
+- **Service**: Chứa nghiệp vụ chính, xử lý dữ liệu trung gian.  
+- **Repository**: Quản lý truy cập và lưu trữ dữ liệu.  
+- **Model**: Đại diện cho thực thể (Product, Customer, Order...).
+- **StroreApplication**: Điểm khởi chạy chính của hệ thống.
+
+
 ## Kiến thức Kotlin áp dụng 
 
 | Chủ đề | Nội dung chính |
