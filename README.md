@@ -85,7 +85,7 @@ Mục tiêu: hỗ trợ **quản lý sản phẩm**, **khách hàng**, và **đ�
 ## Sơ đồ lớp hệ thống
 
 <p align="center">
-  <img src="images/class diagram.png" alt="Cấu trúc dự án" width="500"/>
+  <img src="images/class-diagram.png" alt="Sơ đồ lớp hệ thống" width="500"/>
 </p>
 
 ## Luồng hoạt động của dự án
