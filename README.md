@@ -82,6 +82,11 @@ Mục tiêu: hỗ trợ **quản lý sản phẩm**, **khách hàng**, và **đ�
 │ └── StoreApplication.kt # Điểm khởi chạy chính của ứng dụng
 ```
 
+## Sơ đồ lớp hệ thống
+
+<p align="center">
+  <img src="images/class diagram.png" alt="Cấu trúc dự án" width="500"/>
+</p>
 
 ## Luồng hoạt động của dự án
 
