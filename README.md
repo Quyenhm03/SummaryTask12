@@ -105,4 +105,4 @@ Mục tiêu: hỗ trợ **quản lý sản phẩm**, **khách hàng**, và **đ�
 - **Ngôn ngữ:** Kotlin  
 - **Paradigm:** OOP + Functional Features  
 - **IDE:** IntelliJ IDEA / Android Studio  
-- **Database:** In-memory / SQLite (mô phỏng)  
+- **Database:** SQLite (mô phỏng)  
