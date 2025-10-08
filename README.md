@@ -103,7 +103,7 @@ Mục tiêu: hỗ trợ **quản lý sản phẩm**, **khách hàng**, và **đ�
 ## Luồng hoạt động của dự án
 
 <p align="center">
-  <img src="images/csdl.png" alt="Cơ sở dữ liệu" width="500"/>
+  <img src="images/csdl.jpg" alt="Cơ sở dữ liệu" width="500"/>
 </p>
 
 ## Kiến thức Kotlin áp dụng 
