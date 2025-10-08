@@ -100,6 +100,11 @@ Mục tiêu: hỗ trợ **quản lý sản phẩm**, **khách hàng**, và **đ�
 - **Model**: Đại diện cho thực thể (Product, Customer, Order...).
 - **StroreApplication**: Điểm khởi chạy chính của hệ thống.
 
+## Luồng hoạt động của dự án
+
+<p align="center">
+  <img src="images/csdl.png" alt="Cơ sở dữ liệu" width="500"/>
+</p>
 
 ## Kiến thức Kotlin áp dụng 
 
